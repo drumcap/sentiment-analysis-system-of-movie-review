@@ -5,7 +5,7 @@ __author__ = 'onecue'
 
 import scrapy
 
-from movie_scrap.movie_scrap.items import CommunityItem
+from movie_scrap.items import CommunityItem
 
 from datetime import datetime
 import re
