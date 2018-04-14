@@ -67,6 +67,7 @@ LOG_LEVEL = 'INFO'
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
    'movie_scrap.pipelines.JsonWriterPipeline': 300,
+   'movie_scrap.pipelines.JsonPipeline': 300,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

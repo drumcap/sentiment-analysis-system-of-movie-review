@@ -10,14 +10,15 @@ import scrapy
 
 class MovieScrapItem(scrapy.Item):
     # define the fields for your item here like:
-    # review_id = scrapy.Field()
-    # rating = scrapy.Field()
-    # movie_id = scrapy.Field()
-    # review_title = scrapy.Field()
-    # review_txt = scrapy.Field()
-    # author = scrapy.Field()
-    # date = scrapy.Field()
-    # source = scrapy.Field()
+    review_id = scrapy.Field()
+    rating = scrapy.Field()
+    movie_id = scrapy.Field()
+    movie_name = scrapy.Field()
+    review_title = scrapy.Field()
+    review_txt = scrapy.Field()
+    author = scrapy.Field()
+    date = scrapy.Field()
+    source = scrapy.Field()
     pass
 
 class CommunityItem(scrapy.Item):
