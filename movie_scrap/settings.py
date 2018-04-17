@@ -33,6 +33,9 @@ LOG_LEVEL = 'INFO'
 #CONCURRENT_REQUESTS_PER_DOMAIN = 16
 #CONCURRENT_REQUESTS_PER_IP = 16
 
+DOWNLOAD_DELAY = 3
+CONCURRENT_REQUESTS_PER_DOMAIN = 2
+
 # Disable cookies (enabled by default)
 #COOKIES_ENABLED = False
 
@@ -66,8 +69,9 @@ LOG_LEVEL = 'INFO'
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
+   # 'movie_scrap.pipelines.JsonPipeline': 300,
    'movie_scrap.pipelines.JsonWriterPipeline': 300,
-   'movie_scrap.pipelines.JsonPipeline': 300,
+   # 'movie_scrap.pipelines.CsvPipeline': 300,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

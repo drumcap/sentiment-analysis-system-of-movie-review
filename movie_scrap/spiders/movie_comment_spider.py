@@ -4,7 +4,7 @@ __author__ = 'drumcap'
 import scrapy
 
 from movie_scrap.items import MovieScrapItem
-
+from urllib.parse import urlparse, parse_qs
 from datetime import datetime
 import re
 import random
@@ -12,10 +12,13 @@ import time
 
 extract_nums = lambda s: re.search('\d+', s).group(0)
 sanitize_str = lambda s: s.strip()
+rand_sleep = lambda max: time.sleep(int(random.randrange(1, max)))
 
 NAVER_BASEURL     = 'http://movie.naver.com/movie/point/af/list.nhn'
 NAVER_RATINGURL   = NAVER_BASEURL + '?&page=%s'
 NAVER_MOVIEURL    = NAVER_BASEURL + '?st=mcode&target=after&sword=%s&page=%s'
+
+NAVER_MOVIE_RANK  = 'https://movie.naver.com/movie/sdb/rank/rmovie.nhn?sel=pnt&tg=%s&page=%s'
 
 class MovieCommentSpider(scrapy.Spider):
     name = "movie"
@@ -23,9 +26,23 @@ class MovieCommentSpider(scrapy.Spider):
     def extract_nums(self, s): return re.search('\d+', s).group(0)
 
     def start_requests(self):
-        yield scrapy.Request(NAVER_RATINGURL % 1, self.parse_naver)
+        for i in range(1, 19, 1):
+            yield scrapy.Request(NAVER_MOVIE_RANK % (8, i), self.parse_naver_rank)
 
-    def parse_naver(self, response):
+
+    def parse_naver_rank(self, response):
+        for movie_code in response.css('#old_content > table > tbody > tr > td.title > div > a::attr(href)').extract():
+            # rand_sleep(5)
+            yield scrapy.Request(NAVER_MOVIEURL % (extract_nums(movie_code), 1), self.parse_naver_cmt)
+
+        next_page = response.css('.pagenavigation .next > a::attr(href)').extract_first()
+        next_page_num = parse_qs(urlparse(next_page).query).get('page')
+        if next_page is not None:
+            # rand_sleep(5)
+            print("1 ######## go next page {}".format(next_page_num))
+            yield response.follow(next_page, callback=self.parse_naver_rank)
+
+    def parse_naver_cmt(self, response):
         dtnow = datetime.now()
         for sel in response.css('#old_content > table > tbody > tr'):
             item = MovieScrapItem()
@@ -40,9 +57,9 @@ class MovieCommentSpider(scrapy.Spider):
             yield item
 
         next_page = response.css('.paging .pg_next::attr(href)').extract_first()
-        next_page_num = int(extract_nums(next_page))
+        next_page_n = parse_qs(urlparse(next_page).query).get('page')
+        next_page_num = int(next_page_n[0]) if next_page_n is not None else 0
         if next_page is not None and next_page_num < 1000:
-            sleep_time = int(random.randrange(3, 7))
-            time.sleep(sleep_time)
-            print("go next page {}".format(next_page_num))
-            yield response.follow(next_page, callback=self.parse_naver)
+            # rand_sleep(5)
+            print("2 ######## go next page {}".format(next_page_num))
+            yield response.follow(next_page, callback=self.parse_naver_cmt)

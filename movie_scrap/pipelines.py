@@ -78,6 +78,7 @@ class JsonWriterPipeline(object):
         self.file.close()
 
     def process_item(self, item, spider):
+        print(item['movie_name'], item['review_txt'])
         line = json.dumps(dict(item), ensure_ascii=False) + "\n" #Item을 한줄씩 구성
         self.file.write(line)
         return item
