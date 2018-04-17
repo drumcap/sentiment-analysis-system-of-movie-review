@@ -39,7 +39,7 @@ class MovieCommentSpider(scrapy.Spider):
         next_page_num = parse_qs(urlparse(next_page).query).get('page')
         if next_page is not None:
             # rand_sleep(5)
-            print("1 ######## go next page {}".format(next_page_num))
+            print("1 ######## go next page {}".format(next_page))
             yield response.follow(next_page, callback=self.parse_naver_rank)
 
     def parse_naver_cmt(self, response):
@@ -61,5 +61,5 @@ class MovieCommentSpider(scrapy.Spider):
         next_page_num = int(next_page_n[0]) if next_page_n is not None else 0
         if next_page is not None and next_page_num < 1000:
             # rand_sleep(5)
-            print("2 ######## go next page {}".format(next_page_num))
+            print("2 ######## go next page {}".format(next_page))
             yield response.follow(next_page, callback=self.parse_naver_cmt)
