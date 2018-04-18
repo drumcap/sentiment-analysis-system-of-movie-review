@@ -46,7 +46,7 @@ class MovieCommentSpider(scrapy.Spider):
             item['movie_name'] = sel.xpath('./td[@class="title"]/a/text()').extract_first()
             item['review_txt'] = ' '.join(sel.xpath('./td[@class="title"]/text()').extract()).strip()
             item['author'] = sel.xpath('./td[@class="num"]/a/text()').extract_first()
-            item['date'] = datetime.strptime(sel.xpath('./td[@class="num"]/text()').extract_first(),'%y.%m.%d').isoformat()
+            item['date'] = datetime.strptime(sel.xpath('./td[@class="num"]/text()').extract_first(),'%y.%m.%d').astimezone().isoformat()
             yield item
 
         next_page = response.css('.paging .pg_next::attr(href)').extract_first()
