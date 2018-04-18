@@ -26,8 +26,6 @@ class MovieCommentSpider(scrapy.Spider):
         for i in range(1, 20, 1):
             yield scrapy.Request(NAVER_MOVIE_RANK % (i, 1), self.parse_naver_rank)
 
-
-
     def parse_naver_rank(self, response):
         for sel in response.css('#old_content > table > tbody > tr > td.title > div > a'):
             item = MovieScrapItem()

@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import json_lines
+
 __author__ = 'drumcap'
 
 import scrapy
@@ -9,6 +11,7 @@ from datetime import datetime
 import re
 import random
 import time
+import json
 
 extract_nums = lambda s: re.search('\d+', s).group(0)
 sanitize_str = lambda s: s.strip()
@@ -26,21 +29,11 @@ class MovieCommentSpider(scrapy.Spider):
     def extract_nums(self, s): return re.search('\d+', s).group(0)
 
     def start_requests(self):
-        for i in range(1, 19, 1):
-            yield scrapy.Request(NAVER_MOVIE_RANK % (8, i), self.parse_naver_rank)
+        filename = 'movie-info-items.jl'
 
-
-    def parse_naver_rank(self, response):
-        for movie_code in response.css('#old_content > table > tbody > tr > td.title > div > a::attr(href)').extract():
-            # rand_sleep(5)
-            yield scrapy.Request(NAVER_MOVIEURL % (extract_nums(movie_code), 1), self.parse_naver_cmt)
-
-        next_page = response.css('.pagenavigation .next > a::attr(href)').extract_first()
-        next_page_num = parse_qs(urlparse(next_page).query).get('page')
-        if next_page is not None:
-            # rand_sleep(5)
-            print("1 ######## go next page {}".format(next_page))
-            yield response.follow(next_page, callback=self.parse_naver_rank)
+        with json_lines.open(filename) as f:
+            for item in f:
+                yield scrapy.Request(NAVER_MOVIEURL % (item.get('movie_id'), 1), self.parse_naver_cmt)
 
     def parse_naver_cmt(self, response):
         dtnow = datetime.now()
@@ -60,6 +53,5 @@ class MovieCommentSpider(scrapy.Spider):
         next_page_n = parse_qs(urlparse(next_page).query).get('page')
         next_page_num = int(next_page_n[0]) if next_page_n is not None else 0
         if next_page is not None and next_page_num < 1000:
-            # rand_sleep(5)
             print("2 ######## go next page {}".format(next_page))
             yield response.follow(next_page, callback=self.parse_naver_cmt)
