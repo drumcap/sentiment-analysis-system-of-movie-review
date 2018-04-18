@@ -5,4 +5,4 @@ from scrapy import cmdline
 
 # cmdline.execute("scrapy crawl quotes".split())
 # cmdline.execute("scrapy crawl naver_news -o naver_news.jl".split())
-cmdline.execute("scrapy crawl movie".split())
+cmdline.execute("scrapy crawl movie-rank".split())

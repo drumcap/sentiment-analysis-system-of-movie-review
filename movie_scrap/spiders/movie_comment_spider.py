@@ -3,7 +3,7 @@ __author__ = 'drumcap'
 
 import scrapy
 
-from movie_scrap.items import MovieScrapItem
+from movie_scrap.items import MovieCommentItem
 from urllib.parse import urlparse, parse_qs
 from datetime import datetime
 import re
@@ -21,7 +21,7 @@ NAVER_MOVIEURL    = NAVER_BASEURL + '?st=mcode&target=after&sword=%s&page=%s'
 NAVER_MOVIE_RANK  = 'https://movie.naver.com/movie/sdb/rank/rmovie.nhn?sel=pnt&tg=%s&page=%s'
 
 class MovieCommentSpider(scrapy.Spider):
-    name = "movie"
+    name = "movie-comment"
 
     def extract_nums(self, s): return re.search('\d+', s).group(0)
 
@@ -45,7 +45,7 @@ class MovieCommentSpider(scrapy.Spider):
     def parse_naver_cmt(self, response):
         dtnow = datetime.now()
         for sel in response.css('#old_content > table > tbody > tr'):
-            item = MovieScrapItem()
+            item = MovieCommentItem()
             item['source'] = 'naver'
             item['review_id'] = sel.xpath('./td[@class="ac num"]/text()').extract_first()
             item['rating'] = sel.xpath('./td[@class="point"]/text()').extract_first()
