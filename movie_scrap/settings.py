@@ -22,7 +22,7 @@ NEWSPIDER_MODULE = 'movie_scrap.spiders'
 ROBOTSTXT_OBEY = False
 
 # LOG_FILE = 'scrapy.log'
-LOG_LEVEL = 'DEBUG'
+LOG_LEVEL = 'INFO'
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
 
