@@ -22,7 +22,7 @@ NEWSPIDER_MODULE = 'movie_scrap.spiders'
 ROBOTSTXT_OBEY = False
 
 # LOG_FILE = 'scrapy.log'
-LOG_LEVEL = 'INFO'
+LOG_LEVEL = 'DEBUG'
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32
 
@@ -34,9 +34,8 @@ LOG_LEVEL = 'INFO'
 #CONCURRENT_REQUESTS_PER_DOMAIN = 16
 #CONCURRENT_REQUESTS_PER_IP = 16
 
-# DOWNLOAD_DELAY = 0.2
-DOWNLOAD_DELAY = 30
-CONCURRENT_REQUESTS_PER_DOMAIN = 1
+DOWNLOAD_DELAY = 0.2
+# CONCURRENT_REQUESTS_PER_DOMAIN = 1
 
 # Disable cookies (enabled by default)
 #COOKIES_ENABLED = False

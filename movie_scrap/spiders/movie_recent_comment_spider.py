@@ -24,9 +24,7 @@ class MovieCommentSpider(scrapy.Spider):
     def extract_nums(self, s): return re.search('\d+', s).group(0)
 
     def start_requests(self):
-        for _ in range(1, 5):
-            print("테스트 : %s"%_)
-            yield scrapy.Request(NAVER_BASEURL, self.parse_naver_cmt, dont_filter=True)
+        yield scrapy.Request(NAVER_BASEURL, self.parse_naver_cmt, dont_filter=True)
 
     def parse_naver_cmt(self, response):
         for sel in response.css('#old_content > table > tbody > tr'):

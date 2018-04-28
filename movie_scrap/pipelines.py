@@ -7,6 +7,8 @@
 import codecs
 import json
 import pymongo
+import pickle
+import os
 
 from scrapy.exceptions import DropItem
 from scrapy.exporters import CsvItemExporter, JsonItemExporter
@@ -16,16 +18,25 @@ class MovieScrapPipeline(object):
     def process_item(self, item, spider):
         return item
 
+
 class DuplicatesPipeline(object):
 
     def __init__(self):
         self.ids_seen = set()
+        if os.path.exists('ids_seen.pkl'):
+            with open('ids_seen.pkl', 'rb') as f:
+                self.ids_seen = pickle.load(f)
+        print("아이디 전체갯수 : %s"%len(self.ids_seen))
+
+    def close_spider(self, spider):
+        with open('ids_seen.pkl', 'wb') as f:
+            pickle.dump(self.ids_seen, f)
 
     def process_item(self, item, spider):
-        if item['id'] in self.ids_seen:
+        if item['review_id'] in self.ids_seen:
             raise DropItem("Duplicate item found: %s" % item)
         else:
-            self.ids_seen.add(item['id'])
+            self.ids_seen.add(item['review_id'])
             return item
 
 class CommunityPipeline(object):
@@ -72,7 +83,7 @@ class JsonPipeline(object):
 class JsonWriterPipeline(object):
 
     def open_spider(self, spider):
-        self.file = open('items.jl', 'w', encoding='utf-8')
+        self.file = open('items.jl', 'a', encoding='utf-8')
 
     def close_spider(self, spider):
         self.file.close()
@@ -107,15 +118,3 @@ class MongoPipeline(object):
     def process_item(self, item, spider):
         self.db[self.collection_name].insert_one(dict(item))
         return item
-
-class DuplicatesPipeline(object):
-
-    def __init__(self):
-        self.ids_seen = set()
-
-    def process_item(self, item, spider):
-        if item['review_id'] in self.ids_seen:
-            raise DropItem("Duplicate item found: %s" % item)
-        else:
-            self.ids_seen.add(item['review_id'])
-            return item
