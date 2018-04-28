@@ -34,8 +34,9 @@ LOG_LEVEL = 'INFO'
 #CONCURRENT_REQUESTS_PER_DOMAIN = 16
 #CONCURRENT_REQUESTS_PER_IP = 16
 
-DOWNLOAD_DELAY = 0.2
-# CONCURRENT_REQUESTS_PER_DOMAIN = 6
+# DOWNLOAD_DELAY = 0.2
+DOWNLOAD_DELAY = 30
+CONCURRENT_REQUESTS_PER_DOMAIN = 1
 
 # Disable cookies (enabled by default)
 #COOKIES_ENABLED = False
@@ -71,6 +72,7 @@ DOWNLOAD_DELAY = 0.2
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
    # 'movie_scrap.pipelines.JsonPipeline': 300,
+   'movie_scrap.pipelines.DuplicatesPipeline': 200,
    'movie_scrap.pipelines.JsonWriterPipeline': 300,
    # 'movie_scrap.pipelines.CsvPipeline': 300,
 }

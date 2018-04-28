@@ -78,7 +78,6 @@ class JsonWriterPipeline(object):
         self.file.close()
 
     def process_item(self, item, spider):
-        print(item)
         line = json.dumps(dict(item), ensure_ascii=False) + "\n" #Item을 한줄씩 구성
         self.file.write(line)
         return item
@@ -108,3 +107,15 @@ class MongoPipeline(object):
     def process_item(self, item, spider):
         self.db[self.collection_name].insert_one(dict(item))
         return item
+
+class DuplicatesPipeline(object):
+
+    def __init__(self):
+        self.ids_seen = set()
+
+    def process_item(self, item, spider):
+        if item['review_id'] in self.ids_seen:
+            raise DropItem("Duplicate item found: %s" % item)
+        else:
+            self.ids_seen.add(item['review_id'])
+            return item
