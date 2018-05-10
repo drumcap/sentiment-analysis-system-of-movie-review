@@ -1,0 +1,451 @@
+{
+  "paragraphs": [
+    {
+      "text": "import org.apache.spark.ml.classification.{NaiveBayesModel, LinearSVCModel, LogisticRegressionModel, MultilayerPerceptronClassificationModel}\n\nval tfNB \u003d NaiveBayesModel.load(\"/eduuser/model/tf-nb\")\nval tfSVC \u003d LinearSVCModel.load(\"/eduuser/model/tf-svc\")\nval tfidfNB \u003d NaiveBayesModel.load(\"/eduuser/model/tfidf-nb\")\nval tfidfSVC \u003d LinearSVCModel.load(\"/eduuser/model/tfidf-svc\")\nval featureExtractor \u003d PipelineModel.load(\"/home/eduuser/model/feature_extractor\")",
+      "user": "anonymous",
+      "dateUpdated": "May 9, 2018 7:36:06 PM",
+      "config": {
+        "colWidth": 12.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala"
+        },
+        "editorMode": "ace/mode/scala",
+        "editorHide": true,
+        "tableHide": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "import org.apache.spark.ml.classification.{NaiveBayesModel, LinearSVCModel, LogisticRegressionModel, MultilayerPerceptronClassificationModel}\ntfNB: org.apache.spark.ml.classification.NaiveBayesModel \u003d NaiveBayesModel (uid\u003dnb_941f5f9a8436) with 2 classes\ntfSVC: org.apache.spark.ml.classification.LinearSVCModel \u003d linearsvc_c0b234df1bcc\ntfidfNB: org.apache.spark.ml.classification.NaiveBayesModel \u003d NaiveBayesModel (uid\u003dnb_eb0ac6ba2895) with 2 classes\ntfidfSVC: org.apache.spark.ml.classification.LinearSVCModel \u003d linearsvc_0ca77c3fd6e5\nfeatureExtractor: org.apache.spark.ml.PipelineModel \u003d pipeline_7619cb88bcd4\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1525484644100_2103920331",
+      "id": "20180504-214404_1390821569",
+      "dateCreated": "May 4, 2018 9:44:04 PM",
+      "dateStarted": "May 9, 2018 8:12:19 AM",
+      "dateFinished": "May 9, 2018 8:12:25 AM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "val testdf \u003d spark.createDataset(\n    Seq(\n        \"최고최고!!! 후후후 멋져\",\n        \"평점이 너무 높아요ㅜㅜ 6점대 ...\",\n        \"번역가가 이 영화 다 망쳤다\",\n        \"타노스 짱\"\n    )\n).toDF(\"review_txt\")\nval testF \u003d featureExtractor.transform(testdf)\nval trans \u003d tfNB.transform(testF)\ntrans.createOrReplaceTempView(\"result\")",
+      "user": "anonymous",
+      "dateUpdated": "May 9, 2018 7:36:16 PM",
+      "config": {
+        "colWidth": 12.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala"
+        },
+        "editorMode": "ace/mode/scala",
+        "tableHide": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "testdf: org.apache.spark.sql.DataFrame \u003d [review_txt: string]\ntestF: org.apache.spark.sql.DataFrame \u003d [review_txt: string, words: array\u003cstring\u003e ... 3 more fields]\ntrans: org.apache.spark.sql.DataFrame \u003d [review_txt: string, words: array\u003cstring\u003e ... 6 more fields]\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1525488024144_1147360865",
+      "id": "20180504-224024_1869893876",
+      "dateCreated": "May 4, 2018 10:40:24 PM",
+      "dateStarted": "May 9, 2018 7:30:44 PM",
+      "dateFinished": "May 9, 2018 7:30:48 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%sql\nselect review_txt, prediction from result",
+      "user": "anonymous",
+      "dateUpdated": "May 9, 2018 7:35:43 PM",
+      "config": {
+        "colWidth": 6.0,
+        "enabled": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "table",
+              "height": 188.0,
+              "optionOpen": false
+            }
+          }
+        },
+        "editorSetting": {
+          "language": "sql"
+        },
+        "editorMode": "ace/mode/sql"
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TABLE",
+            "data": "review_txt\tprediction\n최고최고!!! 후후후 멋져\t1.0\n평점이 너무 높아요ㅜㅜ 6점대 ...\t0.0\n번역가가 이 영화 다 망쳤다\t0.0\n타노스 짱\t1.0\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1525908661587_-1292279373",
+      "id": "20180509-193101_157900402",
+      "dateCreated": "May 9, 2018 7:31:01 PM",
+      "dateStarted": "May 9, 2018 7:31:51 PM",
+      "dateFinished": "May 9, 2018 7:31:51 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "import org.apache.spark.sql.functions._\ntrans.select(avg($\"prediction\")).show()",
+      "user": "anonymous",
+      "dateUpdated": "May 9, 2018 7:35:39 PM",
+      "config": {
+        "colWidth": 6.0,
+        "enabled": true,
+        "results": {
+          "0": {
+            "graph": {
+              "mode": "table",
+              "height": 372.0,
+              "optionOpen": false
+            }
+          }
+        },
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": true
+        },
+        "editorMode": "ace/mode/scala",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "import org.apache.spark.sql.functions._\n+---------------+\n|avg(prediction)|\n+---------------+\n|            0.5|\n+---------------+\n\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1525803494037_2146596568",
+      "id": "20180508-141814_1123986521",
+      "dateCreated": "May 8, 2018 2:18:14 PM",
+      "dateStarted": "May 9, 2018 7:35:12 PM",
+      "dateFinished": "May 9, 2018 7:35:13 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "user": "anonymous",
+      "config": {},
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1525869130179_-1054634771",
+      "id": "20180509-083210_216477906",
+      "dateCreated": "May 9, 2018 8:32:10 AM",
+      "status": "READY",
+      "progressUpdateIntervalMs": 500
+    }
+  ],
+  "name": "영화 감성분석 대시보드",
+  "id": "2DE75AF8V",
+  "angularObjects": {
+    "2DASWD9EJ:shared_process": [],
+    "2DBM89JUH:shared_process": [],
+    "2DDD28X87:shared_process": [],
+    "2DD3X471A:shared_process": [],
+    "2DBW529PX:shared_process": [
+      {
+        "name": "search_20180505_003945_35398435",
+        "object": [
+          {
+            "parser": {},
+            "index": "movies",
+            "type": "movies",
+            "id": "N_mZHmMBbpkEV0gyfrUu",
+            "source": "{\"date\":\"2018-05-02T00:00:00-04:00\",\"path\":\"/home/eduuser/Documents/sentiment-analysis-system-of-movie-review/data/items.jl\",\"review_id\":\"14073598\",\"@timestamp\":\"2018-05-02T02:06:05.853Z\",\"author\":\"exit****\",\"host\":\"front01.bigdatapjt.com\",\"@version\":\"1\",\"rating\":10,\"review_txt\":\"어벤저스어벤저스어벤저스\",\"movie_name\":\"어벤져스: 인피니티 워\",\"source\":\"naver\",\"movie_id\":\"136315\"}"
+          },
+          {
+            "parser": {},
+            "index": "movies",
+            "type": "movies",
+            "id": "oKRv-GIBbpkEV0gyx94R",
+            "source": "{\"date\":\"2015-10-16T00:00:00+09:00\",\"path\":\"/usr/share/logstash/data/movies/items-all.jl\",\"review_id\":\"10437003\",\"@timestamp\":\"2018-04-24T16:14:55.995Z\",\"author\":\"harl****\",\"host\":\"front01.bigdatapjt.com\",\"@version\":\"1\",\"rating\":\"8\",\"review_txt\":\"어벤저스는 역시 어벤저스!!\",\"source\":\"naver\",\"movie_name\":\"어벤져스: 에이지 오브 울트론\",\"movie_id\":\"98438\"}"
+          },
+          {
+            "parser": {},
+            "index": "movies",
+            "type": "movies",
+            "id": "qq93-GIBbpkEV0gy7mbf",
+            "source": "{\"date\":\"2013-05-01T00:00:00+09:00\",\"path\":\"/usr/share/logstash/data/movies/items-all.jl\",\"review_id\":\"7498328\",\"@timestamp\":\"2018-04-24T16:23:50.497Z\",\"author\":\"jrpw****\",\"host\":\"front01.bigdatapjt.com\",\"@version\":\"1\",\"rating\":\"10\",\"review_txt\":\"어벤저스는 어벤저스요 아이언맨은 아이언맨이니라..\",\"source\":\"naver\",\"movie_name\":\"아이언맨 3\",\"movie_id\":\"70254\"}"
+          },
+          {
+            "parser": {},
+            "index": "movies",
+            "type": "movies",
+            "id": "Wpll-GIBbpkEV0gy1stR",
+            "source": "{\"date\":\"2017-07-25T00:00:00+09:00\",\"path\":\"/usr/share/logstash/data/movies/items-all.jl\",\"review_id\":\"12872221\",\"@timestamp\":\"2018-04-24T16:04:04.667Z\",\"author\":\"punk****\",\"host\":\"front01.bigdatapjt.com\",\"@version\":\"1\",\"rating\":\"10\",\"review_txt\":\"어벤저스 아닌 어벤저스 이런게 보통 먹히던데\",\"source\":\"naver\",\"movie_name\":\"캡틴 아메리카: 시빌 워\",\"movie_id\":\"122527\"}"
+          },
+          {
+            "parser": {},
+            "index": "movies",
+            "type": "movies",
+            "id": "rKVw-GIBbpkEV0gyPl7h",
+            "source": "{\"date\":\"2015-06-08T00:00:00+09:00\",\"path\":\"/usr/share/logstash/data/movies/items-all.jl\",\"review_id\":\"9985241\",\"@timestamp\":\"2018-04-24T16:15:26.402Z\",\"author\":\"dark****\",\"host\":\"front01.bigdatapjt.com\",\"@version\":\"1\",\"rating\":\"10\",\"review_txt\":\"원작가 조금 틀어지긴 했지만 어벤저스는 어벤저스네요!!\",\"source\":\"naver\",\"movie_name\":\"어벤져스: 에이지 오브 울트론\",\"movie_id\":\"98438\"}"
+          },
+          {
+            "parser": {},
+            "index": "movies",
+            "type": "movies",
+            "id": "9vosPWMBbpkEV0gyVrmH",
+            "source": "{\"date\":\"2018-05-08T00:00:00-04:00\",\"path\":\"/home/eduuser/Documents/sentiment-analysis-system-of-movie-review/data/items.jl\",\"review_id\":\"14091098\",\"@timestamp\":\"2018-05-08T00:35:05.978Z\",\"author\":\"rava****\",\"host\":\"front01.bigdatapjt.com\",\"@version\":\"1\",\"rating\":10,\"review_txt\":\"응 어벤저스 미만 잡 어벤저스는 갓영화다\",\"movie_name\":\"어벤져스: 인피니티 워\",\"source\":\"naver\",\"movie_id\":\"136315\"}"
+          },
+          {
+            "parser": {},
+            "index": "movies",
+            "type": "movies",
+            "id": "eMaL-GIBbpkEV0gymqSQ",
+            "source": "{\"date\":\"2010-04-29T00:00:00+09:00\",\"path\":\"/usr/share/logstash/data/movies/items-all.jl\",\"review_id\":\"4464356\",\"@timestamp\":\"2018-04-24T16:45:19.793Z\",\"author\":\"jkub****\",\"host\":\"front01.bigdatapjt.com\",\"@version\":\"1\",\"rating\":\"10\",\"review_txt\":\"어벤저스 어셈블!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\",\"source\":\"naver\",\"movie_name\":\"아이언맨 2\",\"movie_id\":\"49008\"}"
+          },
+          {
+            "parser": {},
+            "index": "movies",
+            "type": "movies",
+            "id": "ga93-GIBbpkEV0gy-XEC",
+            "source": "{\"date\":\"2011-05-19T00:00:00+09:00\",\"path\":\"/usr/share/logstash/data/movies/items-all.jl\",\"review_id\":\"5437342\",\"@timestamp\":\"2018-04-24T16:23:53.023Z\",\"author\":\"seco****\",\"host\":\"front01.bigdatapjt.com\",\"@version\":\"1\",\"rating\":\"10\",\"review_txt\":\"어벤저스 기대합니다~\",\"source\":\"naver\",\"movie_name\":\"토르: 천둥의 신\",\"movie_id\":\"69989\"}"
+          },
+          {
+            "parser": {},
+            "index": "movies",
+            "type": "movies",
+            "id": "Vtea-GIBbpkEV0gymhI8",
+            "source": "{\"date\":\"2018-01-04T00:00:00+09:00\",\"path\":\"/usr/share/logstash/data/movies/items-all.jl\",\"review_id\":\"13609829\",\"@timestamp\":\"2018-04-24T17:01:42.612Z\",\"author\":\"cezg****\",\"host\":\"front01.bigdatapjt.com\",\"@version\":\"1\",\"rating\":\"10\",\"review_txt\":\"이게 어벤저스의 원조지\",\"source\":\"naver\",\"movie_name\":\"젠틀맨 리그\",\"movie_id\":\"36343\"}"
+          },
+          {
+            "parser": {},
+            "index": "movies",
+            "type": "movies",
+            "id": "3dKW-GIBbpkEV0gybWK6",
+            "source": "{\"date\":\"2015-08-27T00:00:00+09:00\",\"path\":\"/usr/share/logstash/data/movies/items-all.jl\",\"review_id\":\"10278796\",\"@timestamp\":\"2018-04-24T16:57:08.935Z\",\"author\":\"joyh****\",\"host\":\"front01.bigdatapjt.com\",\"@version\":\"1\",\"rating\":\"1\",\"review_txt\":\"주인공들은 어벤저스...!!!\",\"source\":\"naver\",\"movie_name\":\"샌 안드레아스\",\"movie_id\":\"90596\"}"
+          }
+        ]
+      },
+      {
+        "name": "get_20180505_003945_35398435",
+        "object": {
+          "members": {
+            "date": "2016-10-04T00:00:00-04:00",
+            "path": "/usr/share/logstash/data/movies/items-all.jl",
+            "review_id": "11836583",
+            "@timestamp": "2018-04-24T15:36:18.810Z",
+            "author": "ekgm****",
+            "host": "front01.bigdatapjt.com",
+            "@version": "1",
+            "rating": "2",
+            "review_txt": "주연 남자애... 연기가 좀... 아처구니 없었고..그냥 막 만든 영화 같은 느김...  돈 아까움",
+            "source": "naver",
+            "movie_name": "미스 페레그린과 이상한 아이들의 집",
+            "movie_id": "129383"
+          }
+        }
+      },
+      {
+        "name": "search_20180506_042156_280530571",
+        "object": [
+          {
+            "parser": {},
+            "index": "twitter_mod",
+            "type": "twitter",
+            "id": "cPqgLmMBbpkEV0gy8U3J",
+            "source": "{\"in-reply-to\":990964993204994048,\"@timestamp\":\"2018-04-30T14:45:51.000Z\",\"hashtags\":[],\"@version\":\"1\",\"client\":\"\u003ca href\u003d\\\"http://twitter.com/download/android\\\" rel\u003d\\\"nofollow\\\"\u003eTwitter for Android\u003c\\/a\u003e\",\"source\":\"http://twitter.com/riunamo/status/990965460702085122\",\"user_mentions\":[{\"indices\":[0,10],\"screen_name\":\"chivilt_k\",\"id_str\":\"785766012910080002\",\"name\":\"치빌트/チビルト\",\"id\":785766012910080002},{\"indices\":[11,20],\"screen_name\":\"tamatia_\",\"id_str\":\"743697690\",\"name\":\"츄니즘 정발좀\",\"id\":743697690},{\"indices\":[21,30],\"screen_name\":\"CHIRO_RP\",\"id_str\":\"729868127643672577\",\"name\":\"아기여우\",\"id\":729868127643672577},{\"indices\":[31,39],\"screen_name\":\"M_Pel_E\",\"id_str\":\"4565299051\",\"name\":\"펠이\",\"id\":4565299051}],\"message\":\"@chivilt_k @tamatia_ @CHIRO_RP @M_Pel_E 어벤저스2 : 에이지오브울트론\\n어벤저스3 : 인피니티워\\n어벤저스4 : 가망이없음 \u0026lt;\u0026lt;\u0026lt;\",\"user\":\"riunamo\",\"symbols\":[],\"retweeted\":false}"
+          },
+          {
+            "parser": {},
+            "index": "twitter_mod",
+            "type": "twitter",
+            "id": "3fqgLmMBbpkEV0gyuRTE",
+            "source": "{\"@timestamp\":\"2018-04-30T08:07:12.000Z\",\"hashtags\":[],\"@version\":\"1\",\"client\":\"\u003ca href\u003d\\\"http://twitter.com/download/android\\\" rel\u003d\\\"nofollow\\\"\u003eTwitter for Android\u003c\\/a\u003e\",\"source\":\"http://twitter.com/yrysyxg/status/990865134527561728\",\"message\":\"어벤저스 인피니티워 감상: https://t.co/dF0WnGOLHa\",\"user_mentions\":[],\"user\":\"yrysyxg\",\"symbols\":[],\"retweeted\":false}"
+          },
+          {
+            "parser": {},
+            "index": "twitter_mod",
+            "type": "twitter",
+            "id": "9PqgLmMBbpkEV0gyxB4y",
+            "source": "{\"@timestamp\":\"2018-05-04T06:14:13.000Z\",\"hashtags\":[],\"@version\":\"1\",\"client\":\"\u003ca href\u003d\\\"http://twitter.com/download/android\\\" rel\u003d\\\"nofollow\\\"\u003eTwitter for Android\u003c\\/a\u003e\",\"source\":\"http://twitter.com/hyeollang_talk/status/992286253792952321\",\"message\":\"어벤저스 인피니티워 보고오겠슴다 https://t.co/LaZQbSldz9\",\"user_mentions\":[],\"user\":\"hyeollang_talk\",\"symbols\":[],\"retweeted\":false}"
+          },
+          {
+            "parser": {},
+            "index": "twitter_mod",
+            "type": "twitter",
+            "id": "wPqgLmMBbpkEV0gytA1e",
+            "source": "{\"@timestamp\":\"2018-05-04T12:30:47.000Z\",\"hashtags\":[],\"@version\":\"1\",\"client\":\"\u003ca href\u003d\\\"https://www.wakamesoba98.net/sobacha/\\\" rel\u003d\\\"nofollow\\\"\u003eSobaCha\u003c\\/a\u003e\",\"source\":\"http://twitter.com/DeepSea_NotDSLR/status/992381020933505025\",\"message\":\"어벤저스 인피니티워 봤는데 와..\",\"user_mentions\":[],\"user\":\"DeepSea_NotDSLR\",\"symbols\":[],\"retweeted\":false}"
+          },
+          {
+            "parser": {},
+            "index": "twitter_mod",
+            "type": "twitter",
+            "id": "1_qgLmMBbpkEV0gy7klH",
+            "source": "{\"@timestamp\":\"2018-04-29T12:50:18.000Z\",\"hashtags\":[],\"@version\":\"1\",\"client\":\"\u003ca href\u003d\\\"http://twitter.com/download/iphone\\\" rel\u003d\\\"nofollow\\\"\u003eTwitter for iPhone\u003c\\/a\u003e\",\"source\":\"http://twitter.com/sexmaster_o/status/990573991613022209\",\"message\":\"어벤저스 인피니티워 2회차찍었다\",\"user_mentions\":[],\"user\":\"sexmaster_o\",\"symbols\":[],\"retweeted\":false}"
+          },
+          {
+            "parser": {},
+            "index": "twitter_mod",
+            "type": "twitter",
+            "id": "cfqgLmMBbpkEV0gy2zaC",
+            "source": "{\"urls\":[\"http://youep.tistory.com/1313\"],\"@timestamp\":\"2018-04-29T09:32:52.000Z\",\"hashtags\":[],\"@version\":\"1\",\"client\":\"\u003ca href\u003d\\\"http://notice.tistory.com/1357\\\" rel\u003d\\\"nofollow\\\"\u003eTistory2Twitter\u003c\\/a\u003e\",\"source\":\"http://twitter.com/funnyanimals17/status/990524307724881920\",\"user_mentions\":[],\"message\":\"어벤저스 인피니티워 진주인공 코스프레 https://t.co/KXdJDKjffK\",\"user\":\"funnyanimals17\",\"symbols\":[],\"retweeted\":false}"
+          },
+          {
+            "parser": {},
+            "index": "twitter_mod",
+            "type": "twitter",
+            "id": "SvqgLmMBbpkEV0gyrAXV",
+            "source": "{\"@timestamp\":\"2018-05-01T05:19:33.000Z\",\"hashtags\":[],\"@version\":\"1\",\"client\":\"\u003ca href\u003d\\\"http://twitter.com/download/iphone\\\" rel\u003d\\\"nofollow\\\"\u003eTwitter for iPhone\u003c\\/a\u003e\",\"source\":\"http://twitter.com/kimrice_/status/991185333659160576\",\"message\":\"어벤저스 인피니티워 보다가 잤다고 ㅅㅂ\",\"user_mentions\":[],\"user\":\"kimrice_\",\"symbols\":[],\"retweeted\":false}"
+          },
+          {
+            "parser": {},
+            "index": "twitter_mod",
+            "type": "twitter",
+            "id": "H_q3L2MBbpkEV0gypF4n",
+            "source": "{\"@timestamp\":\"2018-05-05T09:52:34.000Z\",\"hashtags\":[],\"@version\":\"1\",\"client\":\"\u003ca href\u003d\\\"http://twitter.com/download/android\\\" rel\u003d\\\"nofollow\\\"\u003eTwitter for Android\u003c\\/a\u003e\",\"source\":\"http://twitter.com/ded_lte/status/992703590203506689\",\"message\":\"하지만 어벤저스는 진짜재밋엇어 어벤져스 보세요%~~\",\"user_mentions\":[],\"user\":\"ded_lte\",\"symbols\":[],\"retweeted\":false}"
+          },
+          {
+            "parser": {},
+            "index": "twitter_mod",
+            "type": "twitter",
+            "id": "FvqgLmMBbpkEV0gyrwin",
+            "source": "{\"urls\":[\"http://youtu.be/-734QXnosPk?a\"],\"@timestamp\":\"2018-05-02T07:42:58.000Z\",\"hashtags\":[],\"@version\":\"1\",\"client\":\"\u003ca href\u003d\\\"http://www.google.com/\\\" rel\u003d\\\"nofollow\\\"\u003eGoogle\u003c\\/a\u003e\",\"source\":\"http://twitter.com/putyour3fingers/status/991583813594730496\",\"user_mentions\":[{\"indices\":[47,55],\"screen_name\":\"YouTube\",\"id_str\":\"10228272\",\"name\":\"YouTube\",\"id\":10228272}],\"message\":\"어벤저스 인피니티워 숨겨진 영상: https://t.co/TRp86uFLd6 via @YouTube\",\"user\":\"putyour3fingers\",\"symbols\":[],\"retweeted\":false}"
+          },
+          {
+            "parser": {},
+            "index": "twitter_mod",
+            "type": "twitter",
+            "id": "-PqgLmMBbpkEV0gy8U33",
+            "source": "{\"@timestamp\":\"2018-04-30T18:12:18.000Z\",\"hashtags\":[],\"@version\":\"1\",\"client\":\"\u003ca href\u003d\\\"http://twitter.com/download/iphone\\\" rel\u003d\\\"nofollow\\\"\u003eTwitter for iPhone\u003c\\/a\u003e\",\"source\":\"http://twitter.com/roselette_/status/991017412702031878\",\"message\":\"어벤저스 인피니티워 피터토니 주식이 터졌습니다 https://t.co/mv6BmUIoqs\",\"user_mentions\":[],\"user\":\"roselette_\",\"symbols\":[],\"retweeted\":false}"
+          }
+        ]
+      },
+      {
+        "name": "search_20180508_142309_2025581401",
+        "object": [
+          {
+            "parser": {},
+            "index": "twitter_mod",
+            "type": "twitter",
+            "id": "cPqgLmMBbpkEV0gy8U3J",
+            "source": "{\"message\":\"@chivilt_k @tamatia_ @CHIRO_RP @M_Pel_E 어벤저스2 : 에이지오브울트론\\n어벤저스3 : 인피니티워\\n어벤저스4 : 가망이없음 \u0026lt;\u0026lt;\u0026lt;\"}"
+          },
+          {
+            "parser": {},
+            "index": "twitter_mod",
+            "type": "twitter",
+            "id": "3fqgLmMBbpkEV0gyuRTE",
+            "source": "{\"message\":\"어벤저스 인피니티워 감상: https://t.co/dF0WnGOLHa\"}"
+          },
+          {
+            "parser": {},
+            "index": "twitter_mod",
+            "type": "twitter",
+            "id": "M_qkNWMBbpkEV0gyh5MD",
+            "source": "{\"message\":\"어벤저스 인피니티워 요약 https://t.co/rSFT5nUHD5\"}"
+          },
+          {
+            "parser": {},
+            "index": "twitter_mod",
+            "type": "twitter",
+            "id": "9PqgLmMBbpkEV0gyxB4y",
+            "source": "{\"message\":\"어벤저스 인피니티워 보고오겠슴다 https://t.co/LaZQbSldz9\"}"
+          },
+          {
+            "parser": {},
+            "index": "twitter_mod",
+            "type": "twitter",
+            "id": "1_qgLmMBbpkEV0gy7klH",
+            "source": "{\"message\":\"어벤저스 인피니티워 2회차찍었다\"}"
+          },
+          {
+            "parser": {},
+            "index": "twitter_mod",
+            "type": "twitter",
+            "id": "wPqgLmMBbpkEV0gytA1e",
+            "source": "{\"message\":\"어벤저스 인피니티워 봤는데 와..\"}"
+          },
+          {
+            "parser": {},
+            "index": "twitter_mod",
+            "type": "twitter",
+            "id": "cfqgLmMBbpkEV0gy2zaC",
+            "source": "{\"message\":\"어벤저스 인피니티워 진주인공 코스프레 https://t.co/KXdJDKjffK\"}"
+          },
+          {
+            "parser": {},
+            "index": "twitter_mod",
+            "type": "twitter",
+            "id": "I_pENWMBbpkEV0gyCpD2",
+            "source": "{\"message\":\"아 어벤저스 인피니티워 트리비아 보고싶다\"}"
+          },
+          {
+            "parser": {},
+            "index": "twitter_mod",
+            "type": "twitter",
+            "id": "SvqgLmMBbpkEV0gyrAXV",
+            "source": "{\"message\":\"어벤저스 인피니티워 보다가 잤다고 ㅅㅂ\"}"
+          },
+          {
+            "parser": {},
+            "index": "twitter_mod",
+            "type": "twitter",
+            "id": "H_q3L2MBbpkEV0gypF4n",
+            "source": "{\"message\":\"하지만 어벤저스는 진짜재밋엇어 어벤져스 보세요%~~\"}"
+          }
+        ]
+      }
+    ],
+    "2DDQJ531A:shared_process": [],
+    "2DCSM31XP:shared_process": [],
+    "2DBJJMWQP:shared_process": [],
+    "2DDMNTX1M:shared_process": [],
+    "2DBTZ9BKD:shared_process": [],
+    "2DD9JHS6G:shared_process": [],
+    "2DC84ZZSP:shared_process": [],
+    "2DD2ATG95:shared_process": [],
+    "2DBM7SM8W:shared_process": [],
+    "2DAFTSJ6C:shared_process": [],
+    "2DD58SEDR:shared_process": [],
+    "2DDSNEVK7:shared_process": [],
+    "2DDSB4PHK:shared_process": [],
+    "2DBCGMSFW:shared_process": [],
+    "2DDX99K12:shared_process": []
+  },
+  "config": {},
+  "info": {}
+}

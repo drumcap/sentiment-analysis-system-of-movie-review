@@ -1,0 +1,570 @@
+{
+  "paragraphs": [
+    {
+      "text": "%spark\n//Get list of distinct values on a column for given table\ndef distinctValues(table: String, col: String) : Array[(String, String)] \u003d {\n  sqlContext.sql(\"select distinct \" + col + \" from \" + table + \" order by \" + col).collect.map(x \u003d\u003e (x(0).asInstanceOf[String], x(0).asInstanceOf[String]))\n}\n\n//Get list of tables\ndef tables(): Array[(String, String)] \u003d {\n sqlContext.sql(\"show tables\").collect.map(x \u003d\u003e (x(0).asInstanceOf[String], x(0).asInstanceOf[String]))\n}\n\n//Get list of columns on a given table\ndef columns(table: String) : Array[(String, String)] \u003d {\n  sqlContext.sql(\"select * from \" + table + \" limit 0\").columns.map(x \u003d\u003e (x, x))\n}\n\n//Wrapper for printing any DataFrame in Zeppelin table format\ndef printQueryResultsAsTable(query: String) : Unit \u003d {\n  println(\"query :\" + query)\n  val df \u003d sqlContext.sql(query)\n  println(\"%table \" + df.columns.mkString(\"\\t\"))\n  println(df.map(x \u003d\u003e x.mkString(\"\\t\")).collect().mkString(\"\\n\"))  \n}\n\n//Changes to \"clause\" value in notebook front-end automatically passed back to interpreter\nz.angularBind(\"clause\", \"\")\nvar query \u003d \"\"\nz.angularWatch(\"clause\", (oldVal, newVal) \u003d\u003e {\n    //println(\"clause 변경 : \", oldVal, newVal)\n    query \u003d \"select * from movies where \" + newVal + \" limit 10\"\n})\nz.angularBind(\"columns\", columns(\"movies\"))",
+      "user": "anonymous",
+      "dateUpdated": "May 9, 2018 6:33:00 PM",
+      "config": {
+        "colWidth": 12.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": false
+        },
+        "editorMode": "ace/mode/scala",
+        "editorHide": true,
+        "tableHide": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "distinctValues: (table: String, col: String)Array[(String, String)]\ntables: ()Array[(String, String)]\ncolumns: (table: String)Array[(String, String)]\nprintQueryResultsAsTable: (query: String)Unit\nquery: String \u003d \"\"\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1525496243187_2059334989",
+      "id": "20180505-005723_1919946166",
+      "dateCreated": "May 5, 2018 12:57:23 AM",
+      "dateStarted": "May 8, 2018 12:43:34 PM",
+      "dateFinished": "May 8, 2018 12:43:35 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%angular\r\n\u003clink rel\u003d\"stylesheet\" href\u003d\"https://cdn.rawgit.com/mistic100/jQuery-QueryBuilder/master/dist/css/query-builder.default.min.css\"\u003e\r\n\u003cscript src\u003d\"https://cdn.rawgit.com/mistic100/jQuery-QueryBuilder/master/dist/js/query-builder.standalone.min.js\"\u003e\u003c/script\u003e\r\n\r\n\u003cdiv id\u003d\"builder\"\u003e\u003c/div\u003e\r\n\u003cbutton type\u003d\"submit\" id\u003d\"generateQuery\" class\u003d\"btn btn-primary\"\u003eGenerate Query\u003c/button\u003e\r\n\u003c!-- Grab and use correct paragraph ID for cell 3, see https://zeppelin.apache.org/docs/0.6.0-incubating-SNAPSHOT/assets/themes/zeppelin/img/screenshots/z_runParagraph.gif for an example --\u003e\r\n\u003cbutton type\u003d\"submit\" class\u003d\"btn btn-primary\" ng-click\u003d\"z.runParagraph(\u002720180506-193111_1425006393\u0027);\"\u003eRun Query\u003c/button\u003e\r\n\u003cinput id\u003d\"whereClause\" type\u003d\"text\" ng-model\u003d\"clause\" class\u003d\"hide\"\u003e\u003c/input\u003e\r\n\u003ch3\u003eQuery: select count(*) from movies where {{clause}}\u003c/h3\u003e\r\n\r\n\u003cscript type\u003d\"text/javascript\"\u003e\r\n  var button \u003d $(\u0027#generateQuery\u0027);\r\n  var qb \u003d $(\u0027#builder\u0027);\r\n  var whereClause \u003d $(\u0027#whereClause\u0027);\r\n  \r\n  button.click(function(){\r\n    var log \u003d qb.queryBuilder(\u0027getSQL\u0027).sql\r\n    console.log(log)\r\n    whereClause.val(log);\r\n    whereClause.trigger(\u0027input\u0027) //triggers Angular to detect changed value\r\n  });\r\n  \r\n  var el \u003d angular.element(qb.parent(\u0027.ng-scope\u0027));\r\n  angular.element(el).ready(function(){\r\n    //Executes on page-load and on update to \u0027columns\u0027, defined in first snippet\r\n    window.watcher \u003d el.scope().compiledScope.$watch(\u0027columns\u0027, function(newVal, oldVal) {\r\n      //Append each column to QueryBuilder\u0027s list of filters\r\n      var options \u003d {allowEmpty: true, filters: []}\r\n      $.each(newVal, function(i, v){\r\n        options.filters.push({id: v._1, type: \u0027string\u0027});\r\n      });\r\n      qb.queryBuilder(options);\r\n      console.log(\"options 로깅\", options)\r\n  });\r\n});\r\n\u003c/script\u003e",
+      "user": "anonymous",
+      "dateUpdated": "May 9, 2018 6:32:56 PM",
+      "config": {
+        "colWidth": 12.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": true
+        },
+        "editorMode": "ace/mode/undefined",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "ANGULAR",
+            "data": "\u003clink rel\u003d\"stylesheet\" href\u003d\"https://cdn.rawgit.com/mistic100/jQuery-QueryBuilder/master/dist/css/query-builder.default.min.css\"\u003e\r\n\u003cscript src\u003d\"https://cdn.rawgit.com/mistic100/jQuery-QueryBuilder/master/dist/js/query-builder.standalone.min.js\"\u003e\u003c/script\u003e\r\n\r\n\u003cdiv id\u003d\"builder\"\u003e\u003c/div\u003e\r\n\u003cbutton type\u003d\"submit\" id\u003d\"generateQuery\" class\u003d\"btn btn-primary\"\u003eGenerate Query\u003c/button\u003e\r\n\u003c!-- Grab and use correct paragraph ID for cell 3, see https://zeppelin.apache.org/docs/0.6.0-incubating-SNAPSHOT/assets/themes/zeppelin/img/screenshots/z_runParagraph.gif for an example --\u003e\r\n\u003cbutton type\u003d\"submit\" class\u003d\"btn btn-primary\" ng-click\u003d\"z.runParagraph(\u002720180506-193111_1425006393\u0027);\"\u003eRun Query\u003c/button\u003e\r\n\u003cinput id\u003d\"whereClause\" type\u003d\"text\" ng-model\u003d\"clause\" class\u003d\"hide\"\u003e\u003c/input\u003e\r\n\u003ch3\u003eQuery: select count(*) from movies where {{clause}}\u003c/h3\u003e\r\n\r\n\u003cscript type\u003d\"text/javascript\"\u003e\r\n  var button \u003d $(\u0027#generateQuery\u0027);\r\n  var qb \u003d $(\u0027#builder\u0027);\r\n  var whereClause \u003d $(\u0027#whereClause\u0027);\r\n  \r\n  button.click(function(){\r\n    var log \u003d qb.queryBuilder(\u0027getSQL\u0027).sql\r\n    console.log(log)\r\n    whereClause.val(log);\r\n    whereClause.trigger(\u0027input\u0027) //triggers Angular to detect changed value\r\n  });\r\n  \r\n  var el \u003d angular.element(qb.parent(\u0027.ng-scope\u0027));\r\n  angular.element(el).ready(function(){\r\n    //Executes on page-load and on update to \u0027columns\u0027, defined in first snippet\r\n    window.watcher \u003d el.scope().compiledScope.$watch(\u0027columns\u0027, function(newVal, oldVal) {\r\n      //Append each column to QueryBuilder\u0027s list of filters\r\n      var options \u003d {allowEmpty: true, filters: []}\r\n      $.each(newVal, function(i, v){\r\n        options.filters.push({id: v._1, type: \u0027string\u0027});\r\n      });\r\n      qb.queryBuilder(options);\r\n      console.log(\"options 로깅\", options)\r\n  });\r\n});\r\n\u003c/script\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1525496256932_1484904881",
+      "id": "20180505-005736_1234715558",
+      "dateCreated": "May 5, 2018 12:57:36 AM",
+      "dateStarted": "May 8, 2018 12:44:14 PM",
+      "dateFinished": "May 8, 2018 12:44:14 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "var cl \u003d z.angular(\"clause\")\nprintQueryResultsAsTable(query)",
+      "user": "anonymous",
+      "dateUpdated": "May 8, 2018 2:02:25 PM",
+      "config": {
+        "colWidth": 12.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": true
+        },
+        "editorMode": "ace/mode/scala",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "cl: Object \u003d movie_name \u003d \u0027고지전\u0027\nquery :select * from movies where movie_name \u003d \u0027고지전\u0027 limit 10\n"
+          },
+          {
+            "type": "TABLE",
+            "data": "author\tdate\tmovie_id\tmovie_name\trating\treview_id\treview_txt\tsource\nstpa****\t2018-04-07\t74315\t고지전\t10\t13981300\t다시보기어려운 전쟁물 명작\tnaver\ndtlo****\t2018-04-07\t74315\t고지전\t10\t13979739\t최고의 전쟁영화..우리의 역사를 기억하자..\tnaver\ngkwn****\t2018-04-06\t74315\t고지전\t10\t13979126\t한국영화대작이다.. 좀만더 흥행했더라면..\tnaver\njjy1****\t2018-04-05\t74315\t고지전\t10\t13976608\t20OOO에 다시 봤는데 다시봐도 명작이다ㅎㄷㄷ\tnaver\neyay****\t2018-04-05\t74315\t고지전\t7\t13975793\t6.25 전쟁을 치르는 병사들의 애환을 덩어리째 전쟁 속에 넣다.\tnaver\ngghi****\t2018-04-05\t74315\t고지전\t10\t13975778\t최고입니다.전쟁은 다시는 일어나서는 안됩니다.\tnaver\nfi11****\t2018-04-05\t74315\t고지전\t1\t13973372\t이게 왜 명작 취급 받는지 1도 이해안된다;; 보는내내 전혀 전시상황같지가 않아서 하나도 몰입이 되질않음\tnaver\ndkle****\t2018-04-04\t74315\t고지전\t9\t13970881\t전쟁의 진정한 참혹함을 전투신에서 아닌 대화와 배우들의 동작, 의미가 담긴 소품, 음악에서 느낄 수 있었네요. 수작이라고 생각합니다. 감독님 영화 잘만드시네요\tnaver\nkky8****\t2018-04-01\t74315\t고지전\t10\t13963584\t단언컨데 내가봤던 영화중에 최고의 수작이다..\tnaver\naqua****\t2018-03-28\t74315\t고지전\t10\t13934669\t사실감 있고 매우 재밌는 전쟁영화임\tnaver\n"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1525649471556_1891973571",
+      "id": "20180506-193111_1425006393",
+      "dateCreated": "May 6, 2018 7:31:11 PM",
+      "dateStarted": "May 8, 2018 2:02:25 PM",
+      "dateFinished": "May 8, 2018 2:02:26 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%angular\n\n\u003cform class\u003d\"form-inline\"\u003e\n  \u003cdiv class\u003d\"form-group\"\u003e\n    \u003clabel for\u003d\"superheroId\"\u003eSuper Hero: \u003c/label\u003e\n    \u003cinput type\u003d\"text\" class\u003d\"form-control\" id\u003d\"superheroId\" placeholder\u003d\"Superhero name ...\" ng-model\u003d\"superhero\"\u003e\u003c/input\u003e\n  \u003c/div\u003e\n  \u003cbutton type\u003d\"submit\" class\u003d\"btn btn-primary\" ng-click\u003d\"z.angularBind(\u0027superhero\u0027,superhero,\u002720180506-192718_993993073\u0027)\"\u003e Bind\u003c/button\u003e\n\u003c/form\u003e",
+      "user": "anonymous",
+      "dateUpdated": "May 6, 2018 8:24:31 PM",
+      "config": {
+        "colWidth": 12.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "markdown",
+          "editOnDblClick": true
+        },
+        "editorMode": "ace/mode/undefined",
+        "editorHide": true,
+        "tableHide": false,
+        "runOnSelectionChange": false
+      },
+      "settings": {
+        "params": {
+          "name": "sunasdf"
+        },
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "ANGULAR",
+            "data": "\u003cform class\u003d\"form-inline\"\u003e\n  \u003cdiv class\u003d\"form-group\"\u003e\n    \u003clabel for\u003d\"superheroId\"\u003eSuper Hero: \u003c/label\u003e\n    \u003cinput type\u003d\"text\" class\u003d\"form-control\" id\u003d\"superheroId\" placeholder\u003d\"Superhero name ...\" ng-model\u003d\"superhero\"\u003e\u003c/input\u003e\n  \u003c/div\u003e\n  \u003cbutton type\u003d\"submit\" class\u003d\"btn btn-primary\" ng-click\u003d\"z.angularBind(\u0027superhero\u0027,superhero,\u002720180506-192718_993993073\u0027)\"\u003e Bind\u003c/button\u003e\n\u003c/form\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1525498119274_373832136",
+      "id": "20180505-012839_328708402",
+      "dateCreated": "May 5, 2018 1:28:39 AM",
+      "dateStarted": "May 6, 2018 8:24:31 PM",
+      "dateFinished": "May 6, 2018 8:24:31 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "%angular\n\n\u003ch2\u003eThe Super Hero Name is {{superhero}}\u003c/h2\u003e",
+      "user": "anonymous",
+      "dateUpdated": "May 6, 2018 8:23:53 PM",
+      "config": {
+        "colWidth": 12.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": true
+        },
+        "editorMode": "ace/mode/undefined",
+        "editorHide": true,
+        "tableHide": false
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "ANGULAR",
+            "data": "\u003ch2\u003eThe Super Hero Name is {{superhero}}\u003c/h2\u003e"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1525649238025_-1603407246",
+      "id": "20180506-192718_993993073",
+      "dateCreated": "May 6, 2018 7:27:18 PM",
+      "dateStarted": "May 6, 2018 8:23:53 PM",
+      "dateFinished": "May 6, 2018 8:23:53 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "text": "for (test \u003c- columns(\"movies\")) {\n    print(test)\n}\n",
+      "user": "anonymous",
+      "dateUpdated": "May 6, 2018 10:21:50 PM",
+      "config": {
+        "colWidth": 12.0,
+        "enabled": true,
+        "results": {},
+        "editorSetting": {
+          "language": "scala",
+          "editOnDblClick": true
+        },
+        "editorMode": "ace/mode/scala",
+        "editorHide": false,
+        "tableHide": true
+      },
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "results": {
+        "code": "SUCCESS",
+        "msg": [
+          {
+            "type": "TEXT",
+            "data": "(author,author)(date,date)(movie_id,movie_id)(movie_name,movie_name)(rating,rating)(review_id,review_id)(review_txt,review_txt)(source,source)"
+          }
+        ]
+      },
+      "apps": [],
+      "jobName": "paragraph_1525652499051_-504911386",
+      "id": "20180506-202139_1888292023",
+      "dateCreated": "May 6, 2018 8:21:39 PM",
+      "dateStarted": "May 6, 2018 8:48:21 PM",
+      "dateFinished": "May 6, 2018 8:48:21 PM",
+      "status": "FINISHED",
+      "progressUpdateIntervalMs": 500
+    },
+    {
+      "user": "anonymous",
+      "config": {},
+      "settings": {
+        "params": {},
+        "forms": {}
+      },
+      "apps": [],
+      "jobName": "paragraph_1525653970544_893813083",
+      "id": "20180506-204610_605627178",
+      "dateCreated": "May 6, 2018 8:46:10 PM",
+      "status": "READY",
+      "progressUpdateIntervalMs": 500
+    }
+  ],
+  "name": "query builder",
+  "id": "2DDZSH3YB",
+  "angularObjects": {
+    "2DASWD9EJ:shared_process": [],
+    "2DBM89JUH:shared_process": [],
+    "2DDD28X87:shared_process": [],
+    "2DD3X471A:shared_process": [],
+    "2DBW529PX:shared_process": [
+      {
+        "name": "search_20180505_003945_35398435",
+        "object": [
+          {
+            "parser": {},
+            "index": "movies",
+            "type": "movies",
+            "id": "N_mZHmMBbpkEV0gyfrUu",
+            "source": "{\"date\":\"2018-05-02T00:00:00-04:00\",\"path\":\"/home/eduuser/Documents/sentiment-analysis-system-of-movie-review/data/items.jl\",\"review_id\":\"14073598\",\"@timestamp\":\"2018-05-02T02:06:05.853Z\",\"author\":\"exit****\",\"host\":\"front01.bigdatapjt.com\",\"@version\":\"1\",\"rating\":10,\"review_txt\":\"어벤저스어벤저스어벤저스\",\"movie_name\":\"어벤져스: 인피니티 워\",\"source\":\"naver\",\"movie_id\":\"136315\"}"
+          },
+          {
+            "parser": {},
+            "index": "movies",
+            "type": "movies",
+            "id": "oKRv-GIBbpkEV0gyx94R",
+            "source": "{\"date\":\"2015-10-16T00:00:00+09:00\",\"path\":\"/usr/share/logstash/data/movies/items-all.jl\",\"review_id\":\"10437003\",\"@timestamp\":\"2018-04-24T16:14:55.995Z\",\"author\":\"harl****\",\"host\":\"front01.bigdatapjt.com\",\"@version\":\"1\",\"rating\":\"8\",\"review_txt\":\"어벤저스는 역시 어벤저스!!\",\"source\":\"naver\",\"movie_name\":\"어벤져스: 에이지 오브 울트론\",\"movie_id\":\"98438\"}"
+          },
+          {
+            "parser": {},
+            "index": "movies",
+            "type": "movies",
+            "id": "qq93-GIBbpkEV0gy7mbf",
+            "source": "{\"date\":\"2013-05-01T00:00:00+09:00\",\"path\":\"/usr/share/logstash/data/movies/items-all.jl\",\"review_id\":\"7498328\",\"@timestamp\":\"2018-04-24T16:23:50.497Z\",\"author\":\"jrpw****\",\"host\":\"front01.bigdatapjt.com\",\"@version\":\"1\",\"rating\":\"10\",\"review_txt\":\"어벤저스는 어벤저스요 아이언맨은 아이언맨이니라..\",\"source\":\"naver\",\"movie_name\":\"아이언맨 3\",\"movie_id\":\"70254\"}"
+          },
+          {
+            "parser": {},
+            "index": "movies",
+            "type": "movies",
+            "id": "Wpll-GIBbpkEV0gy1stR",
+            "source": "{\"date\":\"2017-07-25T00:00:00+09:00\",\"path\":\"/usr/share/logstash/data/movies/items-all.jl\",\"review_id\":\"12872221\",\"@timestamp\":\"2018-04-24T16:04:04.667Z\",\"author\":\"punk****\",\"host\":\"front01.bigdatapjt.com\",\"@version\":\"1\",\"rating\":\"10\",\"review_txt\":\"어벤저스 아닌 어벤저스 이런게 보통 먹히던데\",\"source\":\"naver\",\"movie_name\":\"캡틴 아메리카: 시빌 워\",\"movie_id\":\"122527\"}"
+          },
+          {
+            "parser": {},
+            "index": "movies",
+            "type": "movies",
+            "id": "rKVw-GIBbpkEV0gyPl7h",
+            "source": "{\"date\":\"2015-06-08T00:00:00+09:00\",\"path\":\"/usr/share/logstash/data/movies/items-all.jl\",\"review_id\":\"9985241\",\"@timestamp\":\"2018-04-24T16:15:26.402Z\",\"author\":\"dark****\",\"host\":\"front01.bigdatapjt.com\",\"@version\":\"1\",\"rating\":\"10\",\"review_txt\":\"원작가 조금 틀어지긴 했지만 어벤저스는 어벤저스네요!!\",\"source\":\"naver\",\"movie_name\":\"어벤져스: 에이지 오브 울트론\",\"movie_id\":\"98438\"}"
+          },
+          {
+            "parser": {},
+            "index": "movies",
+            "type": "movies",
+            "id": "9vosPWMBbpkEV0gyVrmH",
+            "source": "{\"date\":\"2018-05-08T00:00:00-04:00\",\"path\":\"/home/eduuser/Documents/sentiment-analysis-system-of-movie-review/data/items.jl\",\"review_id\":\"14091098\",\"@timestamp\":\"2018-05-08T00:35:05.978Z\",\"author\":\"rava****\",\"host\":\"front01.bigdatapjt.com\",\"@version\":\"1\",\"rating\":10,\"review_txt\":\"응 어벤저스 미만 잡 어벤저스는 갓영화다\",\"movie_name\":\"어벤져스: 인피니티 워\",\"source\":\"naver\",\"movie_id\":\"136315\"}"
+          },
+          {
+            "parser": {},
+            "index": "movies",
+            "type": "movies",
+            "id": "eMaL-GIBbpkEV0gymqSQ",
+            "source": "{\"date\":\"2010-04-29T00:00:00+09:00\",\"path\":\"/usr/share/logstash/data/movies/items-all.jl\",\"review_id\":\"4464356\",\"@timestamp\":\"2018-04-24T16:45:19.793Z\",\"author\":\"jkub****\",\"host\":\"front01.bigdatapjt.com\",\"@version\":\"1\",\"rating\":\"10\",\"review_txt\":\"어벤저스 어셈블!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\",\"source\":\"naver\",\"movie_name\":\"아이언맨 2\",\"movie_id\":\"49008\"}"
+          },
+          {
+            "parser": {},
+            "index": "movies",
+            "type": "movies",
+            "id": "ga93-GIBbpkEV0gy-XEC",
+            "source": "{\"date\":\"2011-05-19T00:00:00+09:00\",\"path\":\"/usr/share/logstash/data/movies/items-all.jl\",\"review_id\":\"5437342\",\"@timestamp\":\"2018-04-24T16:23:53.023Z\",\"author\":\"seco****\",\"host\":\"front01.bigdatapjt.com\",\"@version\":\"1\",\"rating\":\"10\",\"review_txt\":\"어벤저스 기대합니다~\",\"source\":\"naver\",\"movie_name\":\"토르: 천둥의 신\",\"movie_id\":\"69989\"}"
+          },
+          {
+            "parser": {},
+            "index": "movies",
+            "type": "movies",
+            "id": "Vtea-GIBbpkEV0gymhI8",
+            "source": "{\"date\":\"2018-01-04T00:00:00+09:00\",\"path\":\"/usr/share/logstash/data/movies/items-all.jl\",\"review_id\":\"13609829\",\"@timestamp\":\"2018-04-24T17:01:42.612Z\",\"author\":\"cezg****\",\"host\":\"front01.bigdatapjt.com\",\"@version\":\"1\",\"rating\":\"10\",\"review_txt\":\"이게 어벤저스의 원조지\",\"source\":\"naver\",\"movie_name\":\"젠틀맨 리그\",\"movie_id\":\"36343\"}"
+          },
+          {
+            "parser": {},
+            "index": "movies",
+            "type": "movies",
+            "id": "3dKW-GIBbpkEV0gybWK6",
+            "source": "{\"date\":\"2015-08-27T00:00:00+09:00\",\"path\":\"/usr/share/logstash/data/movies/items-all.jl\",\"review_id\":\"10278796\",\"@timestamp\":\"2018-04-24T16:57:08.935Z\",\"author\":\"joyh****\",\"host\":\"front01.bigdatapjt.com\",\"@version\":\"1\",\"rating\":\"1\",\"review_txt\":\"주인공들은 어벤저스...!!!\",\"source\":\"naver\",\"movie_name\":\"샌 안드레아스\",\"movie_id\":\"90596\"}"
+          }
+        ]
+      },
+      {
+        "name": "get_20180505_003945_35398435",
+        "object": {
+          "members": {
+            "date": "2016-10-04T00:00:00-04:00",
+            "path": "/usr/share/logstash/data/movies/items-all.jl",
+            "review_id": "11836583",
+            "@timestamp": "2018-04-24T15:36:18.810Z",
+            "author": "ekgm****",
+            "host": "front01.bigdatapjt.com",
+            "@version": "1",
+            "rating": "2",
+            "review_txt": "주연 남자애... 연기가 좀... 아처구니 없었고..그냥 막 만든 영화 같은 느김...  돈 아까움",
+            "source": "naver",
+            "movie_name": "미스 페레그린과 이상한 아이들의 집",
+            "movie_id": "129383"
+          }
+        }
+      },
+      {
+        "name": "search_20180506_042156_280530571",
+        "object": [
+          {
+            "parser": {},
+            "index": "twitter_mod",
+            "type": "twitter",
+            "id": "cPqgLmMBbpkEV0gy8U3J",
+            "source": "{\"in-reply-to\":990964993204994048,\"@timestamp\":\"2018-04-30T14:45:51.000Z\",\"hashtags\":[],\"@version\":\"1\",\"client\":\"\u003ca href\u003d\\\"http://twitter.com/download/android\\\" rel\u003d\\\"nofollow\\\"\u003eTwitter for Android\u003c\\/a\u003e\",\"source\":\"http://twitter.com/riunamo/status/990965460702085122\",\"user_mentions\":[{\"indices\":[0,10],\"screen_name\":\"chivilt_k\",\"id_str\":\"785766012910080002\",\"name\":\"치빌트/チビルト\",\"id\":785766012910080002},{\"indices\":[11,20],\"screen_name\":\"tamatia_\",\"id_str\":\"743697690\",\"name\":\"츄니즘 정발좀\",\"id\":743697690},{\"indices\":[21,30],\"screen_name\":\"CHIRO_RP\",\"id_str\":\"729868127643672577\",\"name\":\"아기여우\",\"id\":729868127643672577},{\"indices\":[31,39],\"screen_name\":\"M_Pel_E\",\"id_str\":\"4565299051\",\"name\":\"펠이\",\"id\":4565299051}],\"message\":\"@chivilt_k @tamatia_ @CHIRO_RP @M_Pel_E 어벤저스2 : 에이지오브울트론\\n어벤저스3 : 인피니티워\\n어벤저스4 : 가망이없음 \u0026lt;\u0026lt;\u0026lt;\",\"user\":\"riunamo\",\"symbols\":[],\"retweeted\":false}"
+          },
+          {
+            "parser": {},
+            "index": "twitter_mod",
+            "type": "twitter",
+            "id": "3fqgLmMBbpkEV0gyuRTE",
+            "source": "{\"@timestamp\":\"2018-04-30T08:07:12.000Z\",\"hashtags\":[],\"@version\":\"1\",\"client\":\"\u003ca href\u003d\\\"http://twitter.com/download/android\\\" rel\u003d\\\"nofollow\\\"\u003eTwitter for Android\u003c\\/a\u003e\",\"source\":\"http://twitter.com/yrysyxg/status/990865134527561728\",\"message\":\"어벤저스 인피니티워 감상: https://t.co/dF0WnGOLHa\",\"user_mentions\":[],\"user\":\"yrysyxg\",\"symbols\":[],\"retweeted\":false}"
+          },
+          {
+            "parser": {},
+            "index": "twitter_mod",
+            "type": "twitter",
+            "id": "9PqgLmMBbpkEV0gyxB4y",
+            "source": "{\"@timestamp\":\"2018-05-04T06:14:13.000Z\",\"hashtags\":[],\"@version\":\"1\",\"client\":\"\u003ca href\u003d\\\"http://twitter.com/download/android\\\" rel\u003d\\\"nofollow\\\"\u003eTwitter for Android\u003c\\/a\u003e\",\"source\":\"http://twitter.com/hyeollang_talk/status/992286253792952321\",\"message\":\"어벤저스 인피니티워 보고오겠슴다 https://t.co/LaZQbSldz9\",\"user_mentions\":[],\"user\":\"hyeollang_talk\",\"symbols\":[],\"retweeted\":false}"
+          },
+          {
+            "parser": {},
+            "index": "twitter_mod",
+            "type": "twitter",
+            "id": "wPqgLmMBbpkEV0gytA1e",
+            "source": "{\"@timestamp\":\"2018-05-04T12:30:47.000Z\",\"hashtags\":[],\"@version\":\"1\",\"client\":\"\u003ca href\u003d\\\"https://www.wakamesoba98.net/sobacha/\\\" rel\u003d\\\"nofollow\\\"\u003eSobaCha\u003c\\/a\u003e\",\"source\":\"http://twitter.com/DeepSea_NotDSLR/status/992381020933505025\",\"message\":\"어벤저스 인피니티워 봤는데 와..\",\"user_mentions\":[],\"user\":\"DeepSea_NotDSLR\",\"symbols\":[],\"retweeted\":false}"
+          },
+          {
+            "parser": {},
+            "index": "twitter_mod",
+            "type": "twitter",
+            "id": "1_qgLmMBbpkEV0gy7klH",
+            "source": "{\"@timestamp\":\"2018-04-29T12:50:18.000Z\",\"hashtags\":[],\"@version\":\"1\",\"client\":\"\u003ca href\u003d\\\"http://twitter.com/download/iphone\\\" rel\u003d\\\"nofollow\\\"\u003eTwitter for iPhone\u003c\\/a\u003e\",\"source\":\"http://twitter.com/sexmaster_o/status/990573991613022209\",\"message\":\"어벤저스 인피니티워 2회차찍었다\",\"user_mentions\":[],\"user\":\"sexmaster_o\",\"symbols\":[],\"retweeted\":false}"
+          },
+          {
+            "parser": {},
+            "index": "twitter_mod",
+            "type": "twitter",
+            "id": "cfqgLmMBbpkEV0gy2zaC",
+            "source": "{\"urls\":[\"http://youep.tistory.com/1313\"],\"@timestamp\":\"2018-04-29T09:32:52.000Z\",\"hashtags\":[],\"@version\":\"1\",\"client\":\"\u003ca href\u003d\\\"http://notice.tistory.com/1357\\\" rel\u003d\\\"nofollow\\\"\u003eTistory2Twitter\u003c\\/a\u003e\",\"source\":\"http://twitter.com/funnyanimals17/status/990524307724881920\",\"user_mentions\":[],\"message\":\"어벤저스 인피니티워 진주인공 코스프레 https://t.co/KXdJDKjffK\",\"user\":\"funnyanimals17\",\"symbols\":[],\"retweeted\":false}"
+          },
+          {
+            "parser": {},
+            "index": "twitter_mod",
+            "type": "twitter",
+            "id": "SvqgLmMBbpkEV0gyrAXV",
+            "source": "{\"@timestamp\":\"2018-05-01T05:19:33.000Z\",\"hashtags\":[],\"@version\":\"1\",\"client\":\"\u003ca href\u003d\\\"http://twitter.com/download/iphone\\\" rel\u003d\\\"nofollow\\\"\u003eTwitter for iPhone\u003c\\/a\u003e\",\"source\":\"http://twitter.com/kimrice_/status/991185333659160576\",\"message\":\"어벤저스 인피니티워 보다가 잤다고 ㅅㅂ\",\"user_mentions\":[],\"user\":\"kimrice_\",\"symbols\":[],\"retweeted\":false}"
+          },
+          {
+            "parser": {},
+            "index": "twitter_mod",
+            "type": "twitter",
+            "id": "H_q3L2MBbpkEV0gypF4n",
+            "source": "{\"@timestamp\":\"2018-05-05T09:52:34.000Z\",\"hashtags\":[],\"@version\":\"1\",\"client\":\"\u003ca href\u003d\\\"http://twitter.com/download/android\\\" rel\u003d\\\"nofollow\\\"\u003eTwitter for Android\u003c\\/a\u003e\",\"source\":\"http://twitter.com/ded_lte/status/992703590203506689\",\"message\":\"하지만 어벤저스는 진짜재밋엇어 어벤져스 보세요%~~\",\"user_mentions\":[],\"user\":\"ded_lte\",\"symbols\":[],\"retweeted\":false}"
+          },
+          {
+            "parser": {},
+            "index": "twitter_mod",
+            "type": "twitter",
+            "id": "FvqgLmMBbpkEV0gyrwin",
+            "source": "{\"urls\":[\"http://youtu.be/-734QXnosPk?a\"],\"@timestamp\":\"2018-05-02T07:42:58.000Z\",\"hashtags\":[],\"@version\":\"1\",\"client\":\"\u003ca href\u003d\\\"http://www.google.com/\\\" rel\u003d\\\"nofollow\\\"\u003eGoogle\u003c\\/a\u003e\",\"source\":\"http://twitter.com/putyour3fingers/status/991583813594730496\",\"user_mentions\":[{\"indices\":[47,55],\"screen_name\":\"YouTube\",\"id_str\":\"10228272\",\"name\":\"YouTube\",\"id\":10228272}],\"message\":\"어벤저스 인피니티워 숨겨진 영상: https://t.co/TRp86uFLd6 via @YouTube\",\"user\":\"putyour3fingers\",\"symbols\":[],\"retweeted\":false}"
+          },
+          {
+            "parser": {},
+            "index": "twitter_mod",
+            "type": "twitter",
+            "id": "-PqgLmMBbpkEV0gy8U33",
+            "source": "{\"@timestamp\":\"2018-04-30T18:12:18.000Z\",\"hashtags\":[],\"@version\":\"1\",\"client\":\"\u003ca href\u003d\\\"http://twitter.com/download/iphone\\\" rel\u003d\\\"nofollow\\\"\u003eTwitter for iPhone\u003c\\/a\u003e\",\"source\":\"http://twitter.com/roselette_/status/991017412702031878\",\"message\":\"어벤저스 인피니티워 피터토니 주식이 터졌습니다 https://t.co/mv6BmUIoqs\",\"user_mentions\":[],\"user\":\"roselette_\",\"symbols\":[],\"retweeted\":false}"
+          }
+        ]
+      },
+      {
+        "name": "search_20180508_142309_2025581401",
+        "object": [
+          {
+            "parser": {},
+            "index": "twitter_mod",
+            "type": "twitter",
+            "id": "cPqgLmMBbpkEV0gy8U3J",
+            "source": "{\"message\":\"@chivilt_k @tamatia_ @CHIRO_RP @M_Pel_E 어벤저스2 : 에이지오브울트론\\n어벤저스3 : 인피니티워\\n어벤저스4 : 가망이없음 \u0026lt;\u0026lt;\u0026lt;\"}"
+          },
+          {
+            "parser": {},
+            "index": "twitter_mod",
+            "type": "twitter",
+            "id": "3fqgLmMBbpkEV0gyuRTE",
+            "source": "{\"message\":\"어벤저스 인피니티워 감상: https://t.co/dF0WnGOLHa\"}"
+          },
+          {
+            "parser": {},
+            "index": "twitter_mod",
+            "type": "twitter",
+            "id": "M_qkNWMBbpkEV0gyh5MD",
+            "source": "{\"message\":\"어벤저스 인피니티워 요약 https://t.co/rSFT5nUHD5\"}"
+          },
+          {
+            "parser": {},
+            "index": "twitter_mod",
+            "type": "twitter",
+            "id": "9PqgLmMBbpkEV0gyxB4y",
+            "source": "{\"message\":\"어벤저스 인피니티워 보고오겠슴다 https://t.co/LaZQbSldz9\"}"
+          },
+          {
+            "parser": {},
+            "index": "twitter_mod",
+            "type": "twitter",
+            "id": "1_qgLmMBbpkEV0gy7klH",
+            "source": "{\"message\":\"어벤저스 인피니티워 2회차찍었다\"}"
+          },
+          {
+            "parser": {},
+            "index": "twitter_mod",
+            "type": "twitter",
+            "id": "wPqgLmMBbpkEV0gytA1e",
+            "source": "{\"message\":\"어벤저스 인피니티워 봤는데 와..\"}"
+          },
+          {
+            "parser": {},
+            "index": "twitter_mod",
+            "type": "twitter",
+            "id": "cfqgLmMBbpkEV0gy2zaC",
+            "source": "{\"message\":\"어벤저스 인피니티워 진주인공 코스프레 https://t.co/KXdJDKjffK\"}"
+          },
+          {
+            "parser": {},
+            "index": "twitter_mod",
+            "type": "twitter",
+            "id": "I_pENWMBbpkEV0gyCpD2",
+            "source": "{\"message\":\"아 어벤저스 인피니티워 트리비아 보고싶다\"}"
+          },
+          {
+            "parser": {},
+            "index": "twitter_mod",
+            "type": "twitter",
+            "id": "SvqgLmMBbpkEV0gyrAXV",
+            "source": "{\"message\":\"어벤저스 인피니티워 보다가 잤다고 ㅅㅂ\"}"
+          },
+          {
+            "parser": {},
+            "index": "twitter_mod",
+            "type": "twitter",
+            "id": "H_q3L2MBbpkEV0gypF4n",
+            "source": "{\"message\":\"하지만 어벤저스는 진짜재밋엇어 어벤져스 보세요%~~\"}"
+          }
+        ]
+      }
+    ],
+    "2DDQJ531A:shared_process": [],
+    "2DCSM31XP:shared_process": [],
+    "2DBJJMWQP:shared_process": [],
+    "2DDMNTX1M:shared_process": [],
+    "2DBTZ9BKD:shared_process": [],
+    "2DD9JHS6G:shared_process": [],
+    "2DC84ZZSP:shared_process": [],
+    "2DD2ATG95:shared_process": [],
+    "2DBM7SM8W:shared_process": [
+      {
+        "name": "clause",
+        "object": "movie_name \u003d \u0027고지전\u0027",
+        "noteId": "2DDZSH3YB"
+      },
+      {
+        "name": "columns",
+        "object": [
+          {
+            "_1": "movie_id",
+            "_2": "movie_id"
+          },
+          {
+            "_1": "movie_name",
+            "_2": "movie_name"
+          },
+          {
+            "_1": "rating",
+            "_2": "rating"
+          },
+          {
+            "_1": "review_id",
+            "_2": "review_id"
+          },
+          {
+            "_1": "review_txt",
+            "_2": "review_txt"
+          },
+          {
+            "_1": "label",
+            "_2": "label"
+          }
+        ],
+        "noteId": "2DDZSH3YB"
+      }
+    ],
+    "2DAFTSJ6C:shared_process": [],
+    "2DD58SEDR:shared_process": [
+      {
+        "name": "superhero",
+        "object": "test",
+        "noteId": "2DDZSH3YB",
+        "paragraphId": "20180506-192718_993993073"
+      }
+    ],
+    "2DDSNEVK7:shared_process": [],
+    "2DDSB4PHK:shared_process": [],
+    "2DBCGMSFW:shared_process": [],
+    "2DDX99K12:shared_process": []
+  },
+  "config": {
+    "looknfeel": "default",
+    "personalizedMode": "false"
+  },
+  "info": {}
+}
