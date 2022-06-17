@@ -10,6 +10,6 @@ urllib3==1.22
 spiderkeeper==1.2.0
 simplejson==3.10.0
 tablib==0.12.1
-scrapy==1.5.0
+scrapy==2.6.1
 pymongo==3.4.0
 json-lines==0.3.1
